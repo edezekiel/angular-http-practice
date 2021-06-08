@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subject, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { Post } from './post.model';
 
 @Injectable({
@@ -33,7 +33,10 @@ export class PostsService {
 
   fetchPosts() {
     return this.http.get<{ [key: string]: Post }>(this.POSTS_URL)
-      .pipe(map(resp => this._convertFireBaseRespToPosts(resp)));
+      .pipe(
+        map(resp => this._convertFireBaseRespToPosts(resp)),
+        catchError(error => throwError(error))
+      );
   }
   
   private _convertFireBaseRespToPosts(resp: { [key: string]: Post }) {
