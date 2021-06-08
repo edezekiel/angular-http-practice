@@ -11,6 +11,7 @@ export class AppComponent implements OnInit {
   loadedPosts: Post[] = [];
   FIREBASE_URL = 'https://ng-complete-guide-15ad4-default-rtdb.firebaseio.com/';
   POSTS_URL = `${this.FIREBASE_URL}posts.json`;
+  isFetching = false;
 
   constructor(private http: HttpClient) {}
 
@@ -30,9 +31,13 @@ export class AppComponent implements OnInit {
   }
 
   private _fetchPosts() {
+    this.isFetching = true;
     this.http.get<{ [key: string]: Post }>(this.POSTS_URL)
       .pipe(map(resp => this._convertFireBaseRespToPosts(resp)))
-      .subscribe(posts => this.loadedPosts = posts);
+      .subscribe(posts => {
+        this.loadedPosts = posts;
+        this.isFetching = false;
+      });
   }
 
   private _convertFireBaseRespToPosts(resp: { [key: string]: Post }) {
