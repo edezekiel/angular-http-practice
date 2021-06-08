@@ -18,8 +18,8 @@ export class AppComponent implements OnInit {
   }
 
   onCreatePost(postData: { title: string; content: string }) {
-    this.http.post(this.POSTS_URL, postData)
-      .subscribe(data => this.loadedPosts.push(data));
+    this.http.post<{name: string}>(this.POSTS_URL, postData)
+      .subscribe(data => console.log(data));
   }
 
   onFetchPosts() {
