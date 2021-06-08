@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Post } from './post.model';
 import { PostsService } from './posts.service';
 @Component({
@@ -6,15 +7,20 @@ import { PostsService } from './posts.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   loadedPosts: Post[] = [];
   isFetching = false;
   error = null;
+
+  private errorSub: Subscription;
 
   constructor(private postsService: PostsService) {}
 
   ngOnInit() {
     this.onFetchPosts();
+    this.errorSub = this.postsService.error.subscribe(errorMessage => {
+      this.error = errorMessage;
+    })
   }
 
   onCreatePost(postData: Post) {
@@ -22,19 +28,22 @@ export class AppComponent implements OnInit {
   }
 
   onFetchPosts() {
-    this.postsService.fetchPosts()
-      .subscribe(posts => {
+    this.postsService.fetchPosts().subscribe(
+      posts => {
         this.isFetching = false;
         this.loadedPosts = posts;
       }, error => {
         this.error = error.message;
-      }
-    )
+    });
   }
 
   onClearPosts() {
     this.postsService.deletePosts().subscribe(_ => {
       this.loadedPosts = [];
     })
+  }
+
+  ngOnDestroy() {
+    this.errorSub.unsubscribe();
   }
 }
