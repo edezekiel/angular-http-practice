@@ -19,6 +19,9 @@ export class PostsService {
       .subscribe(data => console.log(data));
   }
 
+  deletePosts() {
+    return this.http.delete(`${this.POSTS_URL}`);
+  }
 
   fetchPosts() {
     return this.http.get<{ [key: string]: Post }>(this.POSTS_URL)
