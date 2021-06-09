@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -32,7 +32,11 @@ export class PostsService {
   }
 
   fetchPosts() {
-    return this.http.get<{ [key: string]: Post }>(this.POSTS_URL)
+    const reqOptions = {
+      headers: new HttpHeaders({ 'Custom-Header': 'Hello' })
+    };
+
+    return this.http.get<{ [key: string]: Post }>(this.POSTS_URL, reqOptions)
       .pipe(
         map(resp => this._convertFireBaseRespToPosts(resp)),
         catchError(error => throwError(error))
